@@ -8,9 +8,11 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContextWrapper;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -23,10 +25,13 @@ import com.airbnb.lottie.LottieAnimationView;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Locale;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_AUDIO_PERMISSION_CODE = 101;
     MediaRecorder mediaRecorder;
     MediaPlayer mediaPlayer;
+    ImageView ibRegconition;
     ImageView ibRecord;
     ImageView ibPlay;
     TextView tvTime;
@@ -58,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
 
+        ibRegconition = findViewById(R.id.ib_reg);
         ibRecord = findViewById(R.id.ib_record);
         ibPlay = findViewById(R.id.ib_play);
         tvTime = findViewById(R.id.tv_time);
@@ -65,6 +72,37 @@ public class MainActivity extends AppCompatActivity {
         ivSimpleBg = findViewById(R.id.iv_simple_bg);
         lavPlaying = findViewById(R.id.lav_playing);
         mediaPlayer = new MediaPlayer();
+
+        ibRegconition.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AsyncTask.execute(new Runnable() {
+                    @Override
+                    public void run() {
+//                        URL githubEndpoint = new URL("https://api.github.com/");
+//                        // Create connection
+//                        HttpsURLConnection myConnection =
+//                                (HttpsURLConnection) githubEndpoint.openConnection();
+//
+//                        System.out.println("AHIHI");
+
+
+                        Intent intent = new Intent(MainActivity.this, RecognitionActivity.class);
+                        intent.putExtra("key", "ahihi");
+
+
+
+
+
+                        MainActivity.this.startActivity(intent);
+
+//                        getRecordingFilePath()
+
+
+                    }
+                });
+            }
+        });
 
         ibRecord.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -258,7 +296,10 @@ public class MainActivity extends AppCompatActivity {
     {
         ContextWrapper contextWrapper=new ContextWrapper(getApplicationContext());
         File music = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_MUSIC);
-        File file=new File(music,"testFile"+".mp3");
+        File file=new File(music,"testFile"+".wav");
+
+        System.out.println("@@@@@@@@@" + file.getPath());
+
         return file.getPath();
     }
 }
