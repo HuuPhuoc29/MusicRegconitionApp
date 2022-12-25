@@ -6,6 +6,10 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.net.URL;
+
+import javax.net.ssl.HttpsURLConnection;
+
 public class RecognitionActivity extends AppCompatActivity {
 
     @Override

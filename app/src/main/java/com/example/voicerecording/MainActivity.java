@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
+import com.example.voicerecording.HttpCustomClient.APIService;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,13 +34,20 @@ import java.util.concurrent.Executors;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import model.RecognitionModel;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class MainActivity extends AppCompatActivity {
 
 
     private static final int REQUEST_AUDIO_PERMISSION_CODE = 101;
     MediaRecorder mediaRecorder;
     MediaPlayer mediaPlayer;
-    ImageView ibRegconition;
+    ImageView ibRecognition;
     ImageView ibRecord;
     ImageView ibPlay;
     TextView tvTime;
@@ -64,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
 
-        ibRegconition = findViewById(R.id.ib_reg);
+        ibRecognition = findViewById(R.id.ib_reg);
         ibRecord = findViewById(R.id.ib_record);
         ibPlay = findViewById(R.id.ib_play);
         tvTime = findViewById(R.id.tv_time);
@@ -73,28 +81,45 @@ public class MainActivity extends AppCompatActivity {
         lavPlaying = findViewById(R.id.lav_playing);
         mediaPlayer = new MediaPlayer();
 
-        ibRegconition.setOnClickListener(new View.OnClickListener() {
+        ibRecognition.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AsyncTask.execute(new Runnable() {
                     @Override
                     public void run() {
-//                        URL githubEndpoint = new URL("https://api.github.com/");
-//                        // Create connection
-//                        HttpsURLConnection myConnection =
-//                                (HttpsURLConnection) githubEndpoint.openConnection();
-//
-//                        System.out.println("AHIHI");
+                        RequestBody requestBody = new MultipartBody.Builder()
+                                .setType(MultipartBody.FORM)
+//                                .addFormDataPart("type", stringsToPost[0])
+                                .addFormDataPart("file", file.getName(), RequestBody.create(MEDIA_TYPE, file))
+                                .addFormDataPart("file", "audio_16k16bit.pcm", RequestBody.create(MEDIA_TYPE_PNG, "audio_16k16bit"))
+                                .build();
+
+                        APIService.MusicRecognize(requestBody).enqueue(
+                                new Callback<RecognitionModel>() {
+                                    @Override
+                                    public void onResponse(Call<RecognitionModel> call, Response<RecognitionModel> response) {
+                                        //TODO Xử ký dữ liệu trả về
+                                    }
+                                    @Override
+                                    public void onFailure(Call<RecognitionModel> call, Throwable t) {
+                                        //TODO Xử lý lỗi
+                                    }
+                        );
+                    });
+
+
 
 
                         Intent intent = new Intent(MainActivity.this, RecognitionActivity.class);
                         intent.putExtra("key", "ahihi");
 
 
-
-
-
-                        MainActivity.this.startActivity(intent);
+//                        RequestBody requestBody = new MultipartBody.Builder()
+//                                .setType(MultipartBody.FORM)
+//                                .addFormDataPart("audio_file",  getRecordingFilePath()).build();
+//
+//
+//                        MainActivity.this.startActivity(intent);
 
 //                        getRecordingFilePath()
 
@@ -298,7 +323,7 @@ public class MainActivity extends AppCompatActivity {
         File music = contextWrapper.getExternalFilesDir(Environment.DIRECTORY_MUSIC);
         File file=new File(music,"testFile"+".wav");
 
-        System.out.println("@@@@@@@@@" + file.getPath());
+        System.out.println("Path: " + file.getPath());
 
         return file.getPath();
     }
