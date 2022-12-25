@@ -3,6 +3,9 @@ package model;
 import com.google.gson.annotations.SerializedName;
 
 public class RecognitionModel {
+    @SerializedName("id")
+    private String id;
+
     @SerializedName("song_id")
     private String song_id;
     @SerializedName("song_id")
@@ -17,6 +20,7 @@ public class RecognitionModel {
     private String album_id;
     @SerializedName("album_id")
     private String album_name;
+
 }
 
 

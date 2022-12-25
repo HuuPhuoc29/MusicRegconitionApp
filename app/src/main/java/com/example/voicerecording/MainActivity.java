@@ -6,46 +6,51 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioFormat;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.example.voicerecording.HttpCustomClient.APIService;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
+import com.squareup.moshi.Types;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
+import java.lang.reflect.Type;
+import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.net.ssl.HttpsURLConnection;
-
 import model.RecognitionModel;
+import okhttp3.Callback;
+import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.RequestBody;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-
     private static final int REQUEST_AUDIO_PERMISSION_CODE = 101;
-    MediaRecorder mediaRecorder;
+    WavAudioRecorder wavAudioRecorder;
     MediaPlayer mediaPlayer;
     ImageView ibRecognition;
     ImageView ibRecord;
@@ -76,7 +81,6 @@ public class MainActivity extends AppCompatActivity {
         ibRecord = findViewById(R.id.ib_record);
         ibPlay = findViewById(R.id.ib_play);
         tvTime = findViewById(R.id.tv_time);
-//        tvRecordingPath = findViewById(R.id.tv_recording_path);
         ivSimpleBg = findViewById(R.id.iv_simple_bg);
         lavPlaying = findViewById(R.id.lav_playing);
         mediaPlayer = new MediaPlayer();
@@ -84,46 +88,41 @@ public class MainActivity extends AppCompatActivity {
         ibRecognition.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                AsyncTask.execute(new Runnable() {
+                // Khởi tạo OkHttpClient để lấy dữ liệu.
+                OkHttpClient client = new OkHttpClient();
+
+                File file = new File(getRecordingFilePath());
+
+                RequestBody requestBody = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("audio_file", file.getName(),
+                                RequestBody.create(MediaType.parse("audio/wav"), file))
+                        .build();
+                // Tạo request lên server.
+                Request request = new Request.Builder()
+                        .url("http://103.197.184.66/song/recognize")
+                        .post(requestBody)
+                        .build();
+
+                // Thực thi request.
+                client.newCall(request).enqueue(new Callback() {
                     @Override
-                    public void run() {
-                        RequestBody requestBody = new MultipartBody.Builder()
-                                .setType(MultipartBody.FORM)
-//                                .addFormDataPart("type", stringsToPost[0])
-                                .addFormDataPart("file", file.getName(), RequestBody.create(MEDIA_TYPE, file))
-                                .addFormDataPart("file", "audio_16k16bit.pcm", RequestBody.create(MEDIA_TYPE_PNG, "audio_16k16bit"))
-                                .build();
+                    public void onFailure(okhttp3.Call call, IOException e) {
+                        Log.e("Error", String.valueOf(e));
+                        Toast.makeText(getApplicationContext(),"Đã có lỗi xảy ra!!!",Toast.LENGTH_LONG).show();
+                    }
 
-                        APIService.MusicRecognize(requestBody).enqueue(
-                                new Callback<RecognitionModel>() {
-                                    @Override
-                                    public void onResponse(Call<RecognitionModel> call, Response<RecognitionModel> response) {
-                                        //TODO Xử ký dữ liệu trả về
-                                    }
-                                    @Override
-                                    public void onFailure(Call<RecognitionModel> call, Throwable t) {
-                                        //TODO Xử lý lỗi
-                                    }
-                        );
-                    });
-
-
-
-
-                        Intent intent = new Intent(MainActivity.this, RecognitionActivity.class);
-                        intent.putExtra("key", "ahihi");
-
-
-//                        RequestBody requestBody = new MultipartBody.Builder()
-//                                .setType(MultipartBody.FORM)
-//                                .addFormDataPart("audio_file",  getRecordingFilePath()).build();
-//
-//
-//                        MainActivity.this.startActivity(intent);
-
-//                        getRecordingFilePath()
-
-
+                    @Override
+                    public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+                        String json = response.body().string();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent intent = new Intent(MainActivity.this, RecognitionActivity.class);
+                                intent.putExtra("key", json);
+                                MainActivity.this.startActivity(intent);
+                            }
+                        });
                     }
                 });
             }
@@ -138,19 +137,15 @@ public class MainActivity extends AppCompatActivity {
                         executorService.execute(new Runnable() {
                             @Override
                             public void run() {
-                                mediaRecorder = new MediaRecorder();
-                                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-                                mediaRecorder.setOutputFile(getRecordingFilePath());
+                                wavAudioRecorder = new WavAudioRecorder(1,44100,AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT);
+//                                mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+//                                mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+                                wavAudioRecorder.setOutputFile(getRecordingFilePath());
                                 path = getRecordingFilePath();
-                                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+//                                mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
 
-                                try {
-                                    mediaRecorder.prepare();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                mediaRecorder.start();
+                                wavAudioRecorder.prepare();
+                                wavAudioRecorder.start();
 
                                 runOnUiThread(new Runnable() {
                                     @Override
@@ -172,9 +167,10 @@ public class MainActivity extends AppCompatActivity {
                         executorService.execute(new Runnable() {
                             @Override
                             public void run() {
-                                mediaRecorder.stop();
-                                mediaRecorder.release();
-                                mediaRecorder = null;
+                                wavAudioRecorder.stop();
+                                wavAudioRecorder.reset();
+                                wavAudioRecorder.release();
+                                wavAudioRecorder = null;
                                 playableSeconds = seconds;
                                 dummySeconds = seconds;
                                 seconds = 0;
@@ -228,6 +224,7 @@ public class MainActivity extends AppCompatActivity {
                 else
                 {
                     mediaPlayer.stop();
+                    mediaPlayer.reset();
                     mediaPlayer.release();
                     mediaPlayer = null;
                     mediaPlayer = new MediaPlayer();
@@ -263,6 +260,7 @@ public class MainActivity extends AppCompatActivity {
                     if(playableSeconds == -1 && isPlaying)
                     {
                         mediaPlayer.stop();
+                        mediaPlayer.reset();
                         mediaPlayer.release();
                         isPlaying = false;
                         mediaPlayer = null;

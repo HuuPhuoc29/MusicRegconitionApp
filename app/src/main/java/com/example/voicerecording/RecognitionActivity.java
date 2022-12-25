@@ -18,9 +18,7 @@ public class RecognitionActivity extends AppCompatActivity {
 
         String value   = intent.getStringExtra("key");
 
-
         System.out.println("MYINTENTTTT@@@: " + value);
-
 
         super.onCreate(savedInstanceState);
     }
