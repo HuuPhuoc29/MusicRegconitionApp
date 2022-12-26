@@ -77,11 +77,11 @@
 
     <ImageView
         android:id="@+id/ib_reg"
-        android:layout_width="75dp"
-        android:layout_height="73dp"
+        android:layout_width="85dp"
+        android:layout_height="86dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="-252dp"
-        android:layout_marginBottom="77dp"
+        android:layout_marginStart="-263dp"
+        android:layout_marginBottom="74dp"
         android:layout_toEndOf="@id/ib_record"
         android:background="@android:color/transparent"
         android:backgroundTint="@android:color/holo_blue_bright"
@@ -102,15 +102,15 @@
     </ImageView>
 
     <ImageView
-        android:layout_width="70dp"
-        android:layout_height="70dp"
         android:id="@+id/ib_play"
-        android:src="@drawable/recording_play"
+        android:layout_width="77dp"
+        android:layout_height="77dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="75dp"
+        android:layout_marginStart="27dp"
+        android:layout_marginBottom="76dp"
         android:layout_toEndOf="@id/ib_record"
-        android:layout_marginStart="20dp"
-        android:background="@android:color/transparent">
+        android:background="@android:color/transparent"
+        android:src="@drawable/recording_play">
 
     </ImageView>
 </RelativeLayout>

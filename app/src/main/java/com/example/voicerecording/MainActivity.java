@@ -22,9 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.squareup.moshi.JsonAdapter;
-import com.squareup.moshi.Moshi;
-import com.squareup.moshi.Types;
+//import com.squareup.moshi.JsonAdapter;
+//import com.squareup.moshi.Moshi;
+//import com.squareup.moshi.Types;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,14 +38,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import model.RecognitionModel;
+import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -89,7 +92,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // Khởi tạo OkHttpClient để lấy dữ liệu.
-                OkHttpClient client = new OkHttpClient();
+                OkHttpClient client = new OkHttpClient.Builder()
+                        .connectTimeout(30, TimeUnit.SECONDS)
+                        .writeTimeout(30, TimeUnit.SECONDS)
+                        .readTimeout(30, TimeUnit.SECONDS)
+                        .build();
 
                 File file = new File(getRecordingFilePath());
 
@@ -107,14 +114,22 @@ public class MainActivity extends AppCompatActivity {
                 // Thực thi request.
                 client.newCall(request).enqueue(new Callback() {
                     @Override
-                    public void onFailure(okhttp3.Call call, IOException e) {
+                    public void onFailure(Call call, IOException e) {
                         Log.e("Error", String.valueOf(e));
-                        Toast.makeText(getApplicationContext(),"Đã có lỗi xảy ra!!!",Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(),"Đã có lỗi xảy ra!!!",Toast.LENGTH_LONG).show();
                     }
 
                     @Override
-                    public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+                    public void onResponse(Call call, Response response) throws IOException {
                         String json = response.body().string();
+//                        JSONObject jsonObj = null;
+//                        try {
+//                            jsonObj = new JSONObject(json);
+//                        } catch (JSONException e) {
+//                            e.printStackTrace();
+//                        }
+//                        System.out.println(jsonObj);
+
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
