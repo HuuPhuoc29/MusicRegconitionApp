@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/turquoise"
+    android:background="@color/enchanting_sapphire"
     tools:context=".MainActivity">
 
     <com.airbnb.lottie.LottieAnimationView
@@ -65,7 +65,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="VOICE RECORDER"
+            android:text="MUSIC RECOGNITION"
             android:textAlignment="center"
             android:textSize="20sp"
 
@@ -77,11 +77,11 @@
 
     <ImageView
         android:id="@+id/ib_reg"
-        android:layout_width="85dp"
+        android:layout_width="86dp"
         android:layout_height="86dp"
         android:layout_alignParentBottom="true"
-        android:layout_marginStart="-263dp"
-        android:layout_marginBottom="74dp"
+        android:layout_marginStart="-261dp"
+        android:layout_marginBottom="71dp"
         android:layout_toEndOf="@id/ib_record"
         android:background="@android:color/transparent"
         android:backgroundTint="@android:color/holo_blue_bright"
@@ -113,4 +113,5 @@
         android:src="@drawable/recording_play">
 
     </ImageView>
+
 </RelativeLayout>

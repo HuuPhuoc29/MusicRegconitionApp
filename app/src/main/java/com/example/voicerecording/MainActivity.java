@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView ibRecognition;
     ImageView ibRecord;
     ImageView ibPlay;
+//    ImageView ibRegMore;
     TextView tvTime;
 //    TextView tvRecordingPath; line 64, 97
     ImageView ivSimpleBg;

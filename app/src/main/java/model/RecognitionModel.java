@@ -11,15 +11,15 @@ public class RecognitionModel {
     @SerializedName("song_id")
     private String song_id;
     @SerializedName("song_name")
-    private String song_name;
+    public String song_name;
 
     @SerializedName("singer_id")
     private String singer_id;
     @SerializedName("singer_name")
-    private String singer_name;
+    public String singer_name;
 
     @SerializedName("singer_avatar_url")
-    private String singer_avatar_url;
+    public String singer_avatar_url;
 
     @SerializedName("album_id")
     private String album_id;
