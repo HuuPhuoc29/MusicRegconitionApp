@@ -8,6 +8,7 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder.AudioSource;
 import android.util.Log;
+
 public class WavAudioRecorder {
     private final static int[] sampleRates = {44100, 22050, 11025, 8000};
 

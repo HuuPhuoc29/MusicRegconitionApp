@@ -44,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:text="Đây là singer text"
+            android:text="Chưa nhận dạng"
             android:textSize="20dp"
             />
 
@@ -60,7 +60,7 @@
             android:id="@+id/tv_song_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Đây là song text"
+            android:text="Chưa nhận dạng"
             android:layout_marginBottom="8dp"
             android:textSize="20dp"
             />
@@ -77,7 +77,7 @@
             android:id="@+id/tv_album_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Đây là album text"
+            android:text="Chưa nhận dạng"
             android:textSize="20dp"
             />
 
